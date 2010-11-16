@@ -1,0 +1,17 @@
+<?php
+
+include_once('inc_news.features.inc');
+
+function inc_news_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($node->type == 'news' && in_array($op, array('view', 'search result', 'rss item')) && $node->locations[0]['province_name']) {
+    drupal_add_css(drupal_get_path('module', 'inc_news') . '/inc_news.css');
+    $address = "<span class='node-location-line'>{$node->locations[0]['city']}, {$node->locations[0][province_name]}&nbsp;- </span>";
+    $node->content['body']['#value'] = preg_replace('/^(<p[^>]*>)*/', "$1$address", $node->content['body']['#value'], 1);
+    if (!$node->locations[0]['street'] && !$node->locations[0]['name']) {
+      unset($node->content['#content_extra_fields']['locations']);
+      foreach (element_children($node->locations) as $key) {
+        unset ($node->locations[$key]);
+      }
+    }
+  }
+}
